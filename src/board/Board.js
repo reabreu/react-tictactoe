@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Tiles } from "./Tiles";
 import styled from "styled-components";
 import { device } from "../theme/breakpoints";
+import { checkWinner } from "./check-winner";
 
 const BoardWrapper = styled.div`
   display: flex;
@@ -38,21 +39,36 @@ const MainBar = styled.div`
 export const Board = () => {
   const [move, setMove] = useState("X");
   const [moves, setMoves] = useState(new Array(9).fill(null));
+  const [winner, setWinner] = useState(null);
 
   const setPlay = (move, index) => {
+    if (moves[index]) return;
+
     const newMoves = [...moves];
     newMoves[index] = move;
     setMoves(newMoves);
 
     const nextMove = move === "X" ? "O" : "X";
     setMove(nextMove);
+
+    const winner = checkWinner(newMoves);
+
+    if (winner) {
+      setWinner(winner);
+    }
   };
 
   return (
     <BoardWrapper>
       <MainBar>
-        <p>Player Turn: {move}</p>
-        <ResetButton onClick={() => setMoves(new Array(9).fill(null))}>
+        {winner ? <p>Player {winner} wins!!</p> : <p>Player Turn: {move}</p>}
+        <ResetButton
+          onClick={() => {
+            setMoves(new Array(9).fill(null));
+            setWinner(null);
+            setMove("X");
+          }}
+        >
           Reset
         </ResetButton>
       </MainBar>
